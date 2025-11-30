@@ -1,0 +1,49 @@
+[
+  {
+    "algo": "ga",
+    "config": {
+      "population_size": 64,
+      "generations": 204,
+      "chromosome_length": 2,
+      "mutation_rate": 0.1040608142381248,
+      "crossover_rate": 0.8889231326679627,
+      "rng_seed": 4704
+    }
+  },
+  {
+    "algo": "ga",
+    "config": {
+      "population_size": 45,
+      "generations": 109,
+      "chromosome_length": 2,
+      "mutation_rate": 0.13360842682506208,
+      "crossover_rate": 0.7469547929634692,
+      "rng_seed": 5703
+    }
+  },
+  {
+    "algo": "ga",
+    "config": {
+      "population_size": 62,
+      "generations": 163,
+      "chromosome_length": 2,
+      "mutation_rate": 0.07753870334759332,
+      "crossover_rate": 0.5022215113124195,
+      "rng_seed": 4638
+    }
+  },
+  {
+    "algo": "pso",
+    "config": {
+      "num_particles": 38,
+      "num_iterations": 267,
+      "dimension": 2,
+      "inertia": 0.6360179055716013,
+      "cognitive": 1.619463147853161,
+      "social": 2.3300598547089657,
+      "lower_bound": -100,
+      "upper_bound": 100,
+      "rng_seed": 7409
+    }
+  }
+]
