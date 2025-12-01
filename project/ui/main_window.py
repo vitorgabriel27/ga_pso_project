@@ -170,10 +170,10 @@ class MainWindow(QMainWindow):
         self._fill_pso_table(positions_history)
         try:
             from ui.animation import generate_gif_2d, generate_gif_3d
-            gif_2d = generate_gif_2d(positions_history, objective_function, -100, 100, "project/ui/output/pso_anim_2d.gif")
-            gif_3d = generate_gif_3d(positions_history, objective_function, -100, 100, "project/ui/output/pso_anim_3d.gif")
-            self._set_gif(self.animation_label_2d, gif_2d)
-            self._set_gif(self.animation_label_3d, gif_3d)
+            gif_2d_meta = generate_gif_2d(positions_history, objective_function, -100, 100, "project/ui/output/pso_anim_2d.gif")
+            gif_3d_meta = generate_gif_3d(positions_history, objective_function, -100, 100, "project/ui/output/pso_anim_3d.gif")
+            self._set_gif(self.animation_label_2d, gif_2d_meta)
+            self._set_gif(self.animation_label_3d, gif_3d_meta)
         except Exception as e:
             self.animation_label_2d.setText(f"Falha gerar GIF: {e}")
             self.animation_label_3d.setText(f"Falha gerar GIF: {e}")
@@ -231,10 +231,10 @@ class MainWindow(QMainWindow):
         self._fill_ga_table(scaled_history)
         try:
             from ui.animation import generate_gif_2d, generate_gif_3d
-            gif_2d = generate_gif_2d(scaled_history, objective_function, -100, 100, "project/ui/output/ga_anim_2d.gif")
-            gif_3d = generate_gif_3d(scaled_history, objective_function, -100, 100, "project/ui/output/ga_anim_3d.gif")
-            self._set_gif(self.animation_label_2d, gif_2d)
-            self._set_gif(self.animation_label_3d, gif_3d)
+            gif_2d_meta = generate_gif_2d(scaled_history, objective_function, -100, 100, "project/ui/output/ga_anim_2d.gif")
+            gif_3d_meta = generate_gif_3d(scaled_history, objective_function, -100, 100, "project/ui/output/ga_anim_3d.gif")
+            self._set_gif(self.animation_label_2d, gif_2d_meta)
+            self._set_gif(self.animation_label_3d, gif_3d_meta)
         except Exception as e:
             self.animation_label_2d.setText(f"Falha gerar GIF: {e}")
             self.animation_label_3d.setText(f"Falha gerar GIF: {e}")
@@ -243,7 +243,16 @@ class MainWindow(QMainWindow):
         self.ga_thread.quit()
         self.ga_thread.wait()
 
-    def _set_gif(self, label: QLabel, path: str):
+    def _set_gif(self, label: QLabel, meta):
+        # meta may be dict from animation with keys path, index_map, total_original
+        if isinstance(meta, dict):
+            path = meta.get("path")
+            index_map = meta.get("index_map", [])
+            total_original = meta.get("total_original", 0)
+        else:
+            path = meta
+            index_map = []
+            total_original = 0
         if not path or not isinstance(path, str):
             return
         movie = QMovie(path)
@@ -255,19 +264,28 @@ class MainWindow(QMainWindow):
         # Store reference & connect frame change
         if label is self.animation_label_2d:
             self.movie_2d = movie
-            self._connect_movie(movie, self.animation_iter_label_2d)
+            self.movie_2d_index_map = index_map
+            self.movie_2d_total_original = total_original
+            self._connect_movie(movie, self.animation_iter_label_2d, index_map, total_original)
         elif label is self.animation_label_3d:
             self.movie_3d = movie
-            self._connect_movie(movie, self.animation_iter_label_3d)
+            self.movie_3d_index_map = index_map
+            self.movie_3d_total_original = total_original
+            self._connect_movie(movie, self.animation_iter_label_3d, index_map, total_original)
 
-    def _connect_movie(self, movie: QMovie, iter_label: QLabel):
-        total = movie.frameCount() if movie.frameCount() > 0 else 0
-        iter_label.setText(f"Iteração: 0/{total}")
-        movie.frameChanged.connect(lambda f, m=movie, lbl=iter_label: self._on_movie_frame_changed(f, m, lbl))
+    def _connect_movie(self, movie: QMovie, iter_label: QLabel, index_map, total_original):
+        total_frames = movie.frameCount() if movie.frameCount() > 0 else 0
+        # Show original total instead of downsampled count
+        iter_label.setText(f"Iteração: 0/{total_original}")
+        movie.frameChanged.connect(lambda f, m=movie, lbl=iter_label, im=index_map, to=total_original: self._on_movie_frame_changed(f, m, lbl, im, to))
 
-    def _on_movie_frame_changed(self, frame_index: int, movie: QMovie, iter_label: QLabel):
-        total = movie.frameCount() if movie.frameCount() > 0 else 0
-        iter_label.setText(f"Iteração: {frame_index+1}/{total}")
+    def _on_movie_frame_changed(self, frame_index: int, movie: QMovie, iter_label: QLabel, index_map, total_original):
+        # Map sampled frame to original iteration index
+        if index_map and frame_index < len(index_map):
+            orig_iter = index_map[frame_index] + 1
+        else:
+            orig_iter = frame_index + 1
+        iter_label.setText(f"Iteração: {orig_iter}/{total_original}")
 
     def _restart_current_animation(self, index: int):
         if index == 0 and hasattr(self, 'movie_2d'):
