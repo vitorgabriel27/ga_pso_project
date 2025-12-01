@@ -1,7 +1,7 @@
 from PyQt6.QtWidgets import (
     QMainWindow, QWidget, QPushButton,
     QVBoxLayout, QLabel, QTabWidget, QHBoxLayout,
-    QTableWidget, QTableWidgetItem
+    QTableWidget, QTableWidgetItem, QMessageBox
 )
 from PyQt6.QtCore import QThread, Qt
 from PyQt6.QtGui import QMovie
@@ -206,6 +206,21 @@ class MainWindow(QMainWindow):
             self.animation_label_3d.setText(f"Falha gerar GIF: {e}")
         self.vis_function_plot_2d.update_best_point(best_pos)
         self.vis_function_plot_3d.update_best_point(best_pos)
+        hist_raw = result.get("history_best", [])
+        positions_history = result.get("positions_history", [])
+        best_pos = result.get("best_pos", [0,0])
+        
+        if positions_history:
+            last_iteration_pop = positions_history[-1]
+            
+            self.show_execution_report(
+                algo_name="PSO",
+                history_best=hist_raw,
+                final_population=last_iteration_pop,
+                best_position=best_pos,
+                lower=-100, upper=100
+            )
+    
         self.pso_thread.quit()
         self.pso_thread.wait()
 
@@ -267,8 +282,73 @@ class MainWindow(QMainWindow):
             self.animation_label_3d.setText(f"Falha gerar GIF: {e}")
         self.vis_function_plot_2d.update_best_point(best_pos_scaled)
         self.vis_function_plot_3d.update_best_point(best_pos_scaled)
+        
+        hist_raw = result.get("history_best", [])
+        population_history = result.get("population_history", [])
+        
+        best_pos_raw = np.array(result.get("best_pos", [0, 0]))
+        best_pos_scaled = best_pos_raw * 200 - 100
+        
+        if population_history:
+            last_pop_raw = np.array(population_history[-1])
+            last_pop_scaled = last_pop_raw * 200 - 100
+            
+            self.show_execution_report(
+                algo_name="Algoritmo Genético",
+                history_best=hist_raw,
+                final_population=last_pop_scaled,
+                best_position=best_pos_scaled,
+                lower=-100, upper=100
+            )
+
         self.ga_thread.quit()
         self.ga_thread.wait()
+        self.ga_thread.quit()
+        self.ga_thread.wait()
+        
+    def show_execution_report(self, algo_name, history_best, final_population, best_position, lower, upper):
+        """
+        Gera um popup com os dados calculados para o relatório.
+        """
+        # 1. Melhor Fitness Final
+        # O history_best vem negativo (por causa da minimização interna), invertemos aqui
+        real_history = [-val for val in history_best]
+        best_fitness = real_history[-1]
+
+        # 2. Iteração de Estabilização
+        # Critério: Primeira iteração onde o fitness chegou muito próximo (1e-6) do valor final
+        stabilization_iter = 0
+        for i, val in enumerate(real_history):
+            if abs(val - best_fitness) < 1e-6:
+                stabilization_iter = i
+                break
+        
+        # 3. % Vizinhança Final
+        # Recalcula a porcentagem da população que está próxima do melhor indivíduo
+        radius = 10.0 # O mesmo raio usado na tabela
+        pop_arr = np.array(final_population)
+        best_arr = np.array(best_position)
+        
+        neigh_pct = 0.0
+        if pop_arr.size > 0:
+            dists = np.linalg.norm(pop_arr - best_arr, axis=1)
+            neigh_count = np.count_nonzero(dists <= radius)
+            neigh_pct = (neigh_count / len(pop_arr)) * 100.0
+
+        # Monta a mensagem
+        msg = (
+            f"=== RELATÓRIO FINAL: {algo_name} ===\n\n"
+            f"Melhor f(x,y): {best_fitness:.6f}\n"
+            f"Iteração de Estabilização: {stabilization_iter} (de {len(real_history)})\n"
+            f"% Vizinhança Final: {neigh_pct:.2f}%\n"
+            f"Melhor Posição: [{best_position[0]:.4f}, {best_position[1]:.4f}]\n"
+        )
+
+        # Exibe o Popup
+        QMessageBox.information(self, f"Resultado {algo_name}", msg)
+        
+        # Opcional: Imprime no console para facilitar copiar
+        print(msg)
 
     def _set_gif(self, label: QLabel, meta):
         # meta may be dict from animation with keys path, index_map, total_original

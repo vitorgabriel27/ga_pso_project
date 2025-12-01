@@ -1,0 +1,41 @@
+Algoritmo;Cenario;Execucao;Melhor_Fitness;Iter_Convergencia;Vizinhanca_Pct;Params
+GA;GA_Padrao;1;111.25693421565002;0;62.5;{'name': 'GA_Padrao', 'pop': 40, 'gen': 200, 'mut': 0.1, 'cross': 0.7}
+GA;GA_Padrao;2;114.42030010956414;0;55.00000000000001;{'name': 'GA_Padrao', 'pop': 40, 'gen': 200, 'mut': 0.1, 'cross': 0.7}
+GA;GA_Padrao;3;7.373763918832085;0;2.5;{'name': 'GA_Padrao', 'pop': 40, 'gen': 200, 'mut': 0.1, 'cross': 0.7}
+GA;GA_Padrao;4;-6.030683349974767;0;2.5;{'name': 'GA_Padrao', 'pop': 40, 'gen': 200, 'mut': 0.1, 'cross': 0.7}
+GA;GA_Padrao;5;114.0787892051877;0;57.49999999999999;{'name': 'GA_Padrao', 'pop': 40, 'gen': 200, 'mut': 0.1, 'cross': 0.7}
+GA;GA_Pop_Baixa;1;-44.0580632587916;0;5.0;{'name': 'GA_Pop_Baixa', 'pop': 20, 'gen': 200, 'mut': 0.1, 'cross': 0.7}
+GA;GA_Pop_Baixa;2;114.28368303555344;0;65.0;{'name': 'GA_Pop_Baixa', 'pop': 20, 'gen': 200, 'mut': 0.1, 'cross': 0.7}
+GA;GA_Pop_Baixa;3;-16.76626639112655;0;5.0;{'name': 'GA_Pop_Baixa', 'pop': 20, 'gen': 200, 'mut': 0.1, 'cross': 0.7}
+GA;GA_Pop_Baixa;4;-78.23861413476386;0;10.0;{'name': 'GA_Pop_Baixa', 'pop': 20, 'gen': 200, 'mut': 0.1, 'cross': 0.7}
+GA;GA_Pop_Baixa;5;-70.39881030753607;0;10.0;{'name': 'GA_Pop_Baixa', 'pop': 20, 'gen': 200, 'mut': 0.1, 'cross': 0.7}
+GA;GA_Pop_Alta;1;35.77873333895839;0;1.25;{'name': 'GA_Pop_Alta', 'pop': 80, 'gen': 200, 'mut': 0.1, 'cross': 0.7}
+GA;GA_Pop_Alta;2;-14.64449872807805;0;1.25;{'name': 'GA_Pop_Alta', 'pop': 80, 'gen': 200, 'mut': 0.1, 'cross': 0.7}
+GA;GA_Pop_Alta;3;-12.165745683453013;0;1.25;{'name': 'GA_Pop_Alta', 'pop': 80, 'gen': 200, 'mut': 0.1, 'cross': 0.7}
+GA;GA_Pop_Alta;4;114.56654921394106;0;1.25;{'name': 'GA_Pop_Alta', 'pop': 80, 'gen': 200, 'mut': 0.1, 'cross': 0.7}
+GA;GA_Pop_Alta;5;114.8935902838648;0;73.75;{'name': 'GA_Pop_Alta', 'pop': 80, 'gen': 200, 'mut': 0.1, 'cross': 0.7}
+GA;GA_Mut_Alta;1;68.86790511337952;0;2.5;{'name': 'GA_Mut_Alta', 'pop': 40, 'gen': 200, 'mut': 0.2, 'cross': 0.7}
+GA;GA_Mut_Alta;2;112.85470196677741;0;22.5;{'name': 'GA_Mut_Alta', 'pop': 40, 'gen': 200, 'mut': 0.2, 'cross': 0.7}
+GA;GA_Mut_Alta;3;23.985121615720402;0;2.5;{'name': 'GA_Mut_Alta', 'pop': 40, 'gen': 200, 'mut': 0.2, 'cross': 0.7}
+GA;GA_Mut_Alta;4;112.01488045561818;0;2.5;{'name': 'GA_Mut_Alta', 'pop': 40, 'gen': 200, 'mut': 0.2, 'cross': 0.7}
+GA;GA_Mut_Alta;5;37.90556753237892;0;2.5;{'name': 'GA_Mut_Alta', 'pop': 40, 'gen': 200, 'mut': 0.2, 'cross': 0.7}
+PSO;PSO_Padrao;1;114.8965352725431;0;100.0;{'name': 'PSO_Padrao', 'part': 40, 'iter': 200, 'w': 0.7, 'c1': 1.5, 'c2': 1.5}
+PSO;PSO_Padrao;2;114.8965352725431;0;100.0;{'name': 'PSO_Padrao', 'part': 40, 'iter': 200, 'w': 0.7, 'c1': 1.5, 'c2': 1.5}
+PSO;PSO_Padrao;3;114.89653527254309;0;100.0;{'name': 'PSO_Padrao', 'part': 40, 'iter': 200, 'w': 0.7, 'c1': 1.5, 'c2': 1.5}
+PSO;PSO_Padrao;4;114.8965352725431;0;100.0;{'name': 'PSO_Padrao', 'part': 40, 'iter': 200, 'w': 0.7, 'c1': 1.5, 'c2': 1.5}
+PSO;PSO_Padrao;5;114.8965352725431;0;100.0;{'name': 'PSO_Padrao', 'part': 40, 'iter': 200, 'w': 0.7, 'c1': 1.5, 'c2': 1.5}
+PSO;PSO_Inercia_Baixa;1;114.8965352725431;0;100.0;{'name': 'PSO_Inercia_Baixa', 'part': 40, 'iter': 200, 'w': 0.4, 'c1': 1.5, 'c2': 1.5}
+PSO;PSO_Inercia_Baixa;2;114.8965352725431;0;100.0;{'name': 'PSO_Inercia_Baixa', 'part': 40, 'iter': 200, 'w': 0.4, 'c1': 1.5, 'c2': 1.5}
+PSO;PSO_Inercia_Baixa;3;114.8965352725431;0;100.0;{'name': 'PSO_Inercia_Baixa', 'part': 40, 'iter': 200, 'w': 0.4, 'c1': 1.5, 'c2': 1.5}
+PSO;PSO_Inercia_Baixa;4;114.8965352725431;0;100.0;{'name': 'PSO_Inercia_Baixa', 'part': 40, 'iter': 200, 'w': 0.4, 'c1': 1.5, 'c2': 1.5}
+PSO;PSO_Inercia_Baixa;5;114.8965352725431;0;100.0;{'name': 'PSO_Inercia_Baixa', 'part': 40, 'iter': 200, 'w': 0.4, 'c1': 1.5, 'c2': 1.5}
+PSO;PSO_Inercia_Alta;1;114.89641524166015;0;42.5;{'name': 'PSO_Inercia_Alta', 'part': 40, 'iter': 200, 'w': 0.9, 'c1': 1.5, 'c2': 1.5}
+PSO;PSO_Inercia_Alta;2;105.50144280494705;0;32.5;{'name': 'PSO_Inercia_Alta', 'part': 40, 'iter': 200, 'w': 0.9, 'c1': 1.5, 'c2': 1.5}
+PSO;PSO_Inercia_Alta;3;114.89653500618506;0;50.0;{'name': 'PSO_Inercia_Alta', 'part': 40, 'iter': 200, 'w': 0.9, 'c1': 1.5, 'c2': 1.5}
+PSO;PSO_Inercia_Alta;4;114.5923641635829;0;27.500000000000004;{'name': 'PSO_Inercia_Alta', 'part': 40, 'iter': 200, 'w': 0.9, 'c1': 1.5, 'c2': 1.5}
+PSO;PSO_Inercia_Alta;5;114.87013943690741;0;57.49999999999999;{'name': 'PSO_Inercia_Alta', 'part': 40, 'iter': 200, 'w': 0.9, 'c1': 1.5, 'c2': 1.5}
+PSO;PSO_Pop_Alta;1;114.8965352725431;0;100.0;{'name': 'PSO_Pop_Alta', 'part': 80, 'iter': 200, 'w': 0.7, 'c1': 1.5, 'c2': 1.5}
+PSO;PSO_Pop_Alta;2;105.50238969052828;0;100.0;{'name': 'PSO_Pop_Alta', 'part': 80, 'iter': 200, 'w': 0.7, 'c1': 1.5, 'c2': 1.5}
+PSO;PSO_Pop_Alta;3;114.8965352725431;0;100.0;{'name': 'PSO_Pop_Alta', 'part': 80, 'iter': 200, 'w': 0.7, 'c1': 1.5, 'c2': 1.5}
+PSO;PSO_Pop_Alta;4;114.8965352725431;0;100.0;{'name': 'PSO_Pop_Alta', 'part': 80, 'iter': 200, 'w': 0.7, 'c1': 1.5, 'c2': 1.5}
+PSO;PSO_Pop_Alta;5;114.8965352725431;0;100.0;{'name': 'PSO_Pop_Alta', 'part': 80, 'iter': 200, 'w': 0.7, 'c1': 1.5, 'c2': 1.5}
