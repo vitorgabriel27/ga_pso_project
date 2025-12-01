@@ -28,11 +28,13 @@ class MainWindow(QMainWindow):
         self.ga_tab = self.create_ga_tab()
         self.pso_tab = self.create_pso_tab()
         self.visual_tab = self.create_visualization_tab()
+        self.tested_params_tab = self.create_tested_params_tab()
 
         self.tabs.addTab(self.ga_tab, "Algoritmo Genético (GA)")
         self.tabs.addTab(self.pso_tab, "PSO")
         self.tabs.addTab(self.visual_tab, "Visualização")
-
+        self.tabs.addTab(self.tested_params_tab, "Parâmetros Testados")
+        
         container = QWidget()
         layout = QVBoxLayout()
         layout.addWidget(self.tabs)
@@ -119,6 +121,31 @@ class MainWindow(QMainWindow):
         # Restart GIF when switching 2D/3D tabs
         self.animation_tabs.currentChanged.connect(self._restart_current_animation)
         return tab
+    
+    def create_tested_params_tab(self):
+        tab = QWidget()
+        layout = QVBoxLayout()
+
+        title = QLabel("Histórico de Configurações Testadas")
+        layout.addWidget(title)
+
+        # Tabela
+        self.params_table = QTableWidget(0, 3)
+        self.params_table.setHorizontalHeaderLabels(["Algoritmo", "Configuração", "Timestamp"])
+        self.params_table.setEditTriggers(QTableWidget.EditTrigger.NoEditTriggers)
+        layout.addWidget(self.params_table)
+
+        # Botão limpar histórico
+        btn_clear = QPushButton("Limpar Histórico")
+        btn_clear.clicked.connect(self._clear_tested_history)
+        layout.addWidget(btn_clear)
+
+        # Carrega JSON ao iniciar
+        self._load_tested_history()
+
+        tab.setLayout(layout)
+        return tab
+
 
     def run_pso(self, randomize: bool = False):
         self.pso_status.setText("Rodando PSO...")
@@ -380,7 +407,8 @@ class MainWindow(QMainWindow):
             # Keep last 50
             data = data[-50:]
             with open(hist_path, "w", encoding="utf-8") as f:
-                json.dump(data, f, indent=2)
+                json.dump(data, f, indent=2)  
+            self._add_row_to_params_table(entry)
         except Exception:
             # Silent fail for history
             pass
@@ -395,3 +423,42 @@ class MainWindow(QMainWindow):
             self.pso_cfg_label.setText(text)
         elif algo == "ga":
             self.ga_cfg_label.setText(text)
+    
+    def _load_tested_history(self):
+        path = "project/ui/output/tested_parameters.json"
+        if not os.path.exists(path):
+            return
+
+        try:
+            with open(path, "r") as f:
+                data = json.load(f)
+        except:
+            return
+
+        for entry in data:
+            self._add_row_to_params_table(entry)
+            
+    def _add_row_to_params_table(self, entry):
+        row = self.params_table.rowCount()
+        self.params_table.insertRow(row)
+
+        algo = entry.get("algorithm", "")
+        cfg = json.dumps(entry.get("config", {}), indent=2)
+        timestamp = entry.get("timestamp", "")
+
+        self.params_table.setItem(row, 0, QTableWidgetItem(algo))
+        self.params_table.setItem(row, 1, QTableWidgetItem(cfg))
+        self.params_table.setItem(row, 2, QTableWidgetItem(timestamp))
+    
+    def _clear_tested_history(self):
+        path = "project/ui/output/tested_parameters.json"
+        if os.path.exists(path):
+            os.remove(path)
+
+        self.params_table.setRowCount(0)
+        
+    def _current_timestamp(self):
+        import datetime
+        return datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+
