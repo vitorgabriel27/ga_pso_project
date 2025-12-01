@@ -36,6 +36,7 @@ project/
     animation.py
 ```
 
+
 Arquivos principais:
 - `ui/main_window.py`: janela principal, abas, botões e visualizações. Mostra tabelas por iteração e GIFs.
 - `ui/pso_worker.py` e `ui/ga_worker.py`: lógica de execução em thread; acumulam histórico de posições/populações e melhor valor.
@@ -49,80 +50,120 @@ Arquivos principais:
 
 A função utilizada por padrão é uma combinação de termos oscilatórios (tipo Schaffer/Schwefel-like) e um termo quadrático estilo Rosenbrock, definida para vetor de pontos `pos = [[x1,y1], [x2,y2], ...]`:
 
-- Termo oscilatório: \\( z = -x\\, \\sin(\\sqrt{|x|}) - y\\, \\sin(\\sqrt{|y|}) \\)
-- Normalização auxiliar: \\( x_{norm} = x/250,\\ y_{norm} = y/250 \\)
-- Termo tipo Rosenbrock: \\( r = 100\\,(y_{norm} - 2 x_{norm})^2 + (1 - x_{norm})^2 \\)
-- Função final: \\( f(x,y) = r - z \\)
+- Termo oscilatório:
 
-Na interface, minimizamos \\( f(x,y) \\). Para uniformizar sinais entre algoritmos, os workers usam \\(-f\\) internamente (maximizam o negativo) e invertem o sinal para exibir resultados.
+$$
+z = -x \sin(\sqrt{|x|}) \;-\; y \sin(\sqrt{|y|})
+$$
+
+- Normalização auxiliar:
+
+$$
+x_{\text{norm}} = \frac{x}{250},
+\qquad
+y_{\text{norm}} = \frac{y}{250}
+$$
+
+- Termo tipo Rosenbrock:
+
+$$
+r = 100\left( y_{\text{norm}} - 2x_{\text{norm}} \right)^2
+    + \left( 1 - x_{\text{norm}} \right)^2
+$$
+
+- Função final:
+
+$$
+f(x,y) = r - z
+$$
+
+Na interface, minimizamos:
+
+$$
+f(x,y)
+$$
+
+Para uniformizar sinais entre algoritmos, os workers usam:
+
+$$
+-f
+$$
+
+internamente (maximizam o negativo) e invertem o sinal para exibir resultados.
 
 ## Particle Swarm Optimization (PSO)
 
 ### Ideia Matemática
 
-- Inicialização de \\(N\\) partículas com posição \\(\\mathbf{x}_i\\) e velocidade \\(\\mathbf{v}_i\\) dentro de limites \\([L, U]\\).
-- Atualização de velocidades e posições por iteração \\(t\\):
-  $$ \\mathbf{v}_i^{t+1} = \\omega\\,\\mathbf{v}_i^t + c_1 r_1 (\\mathbf{p}_i - \\mathbf{x}_i^t) + c_2 r_2 (\\mathbf{g} - \\mathbf{x}_i^t) $$
-  $$ \\mathbf{x}_i^{t+1} = \\mathbf{x}_i^t + \\mathbf{v}_i^{t+1} $$
-  - \\(\\omega\\): inércia
-  - \\(c_1\\): componente cognitiva
-  - \\(c_2\\): componente social
-  - \\(r_1, r_2 \\sim U(0,1)\\)
-  - \\(\\mathbf{p}_i\\): melhor pessoal
-  - \\(\\mathbf{g}\\): melhor global
+- Inicialização de \(N\) partículas com posição \(\mathbf{x}_i\) e velocidade \(\mathbf{v}_i\) dentro de limites \([L, U]\).
+- Atualização por iteração \(t\):
+
+Velocidade:
+
+\(\mathbf{v}_i^{t+1} = \omega \mathbf{v}_i^{t} + c_1 r_1 \left( \mathbf{p}_i - \mathbf{x}_i^t \right) + c_2 r_2 \left( \mathbf{g} - \mathbf{x}_i^t \right)\)
+
+Parâmetros:
+- \(\omega\): inércia  
+- \(c_1\): componente cognitiva  
+- \(c_2\): componente social  
+- \(r_1, r_2 \sim U(0,1)\)  
+- \(\mathbf{p}_i\): melhor posição pessoal  
+- \(\mathbf{g}\): melhor posição global  
 
 - Restrições de posição e velocidade aplicadas para manter limites.
 
 ### Implementação
 
 - Parâmetros: `num_particles`, `num_iterations`, `dimension`, `inertia`, `cognitive`, `social`, `lower_bound`, `upper_bound`, `rng_seed`.
-- Histórico guardado: `positions_history` (lista de arrays por iteração), `history_best` (valores), `history_best_pos` (posições do melhor).
-- Na UI, a tabela por iteração computa: melhor ponto por iteração, `f(x,y)` nesse ponto e `% de vizinhança` = fração das partículas dentro de um raio fixo (default 10) em torno do melhor ponto daquela iteração.
+- Histórico guardado: `positions_history`, `history_best`, `history_best_pos`.
+- Na UI, o `% de vizinhança` é a fração de partículas dentro de raio fixo (10) em torno do melhor ponto.
 
 ## Algoritmo Genético (GA)
 
 ### Ideia Matemática
 
-- Representação: cromossomos reais no intervalo \\([0,1]\\) por dimensão; mapeados para \\([-100, 100]\\) para avaliação: \\( \\mathbf{x} = 200\\,\\mathbf{c} - 100 \\).
-- Ciclo por geração:
-  1. Avaliação de aptidão (usamos \\(-f\\) para uniformizar minimização).
-  2. Seleção (e.g. roleta): probabilidade proporcional à aptidão.
-  3. Crossover (um ponto): pareamento de indivíduos e troca de segmentos em ponto aleatório.
-  4. Mutação (uniforme): perturbações leves em genes com taxa \\(\\mu\\).
-  5. Elitismo (se aplicável): preserva melhores entre gerações.
+- Representação: cromossomos reais em \([0,1]\) por dimensão; mapeados para \([-100, 100]\):
+
+$$
+\mathbf{x} = 200\mathbf{c} - 100
+$$
+
+Ciclo por geração:
+
+1. Avaliação via aptidão (usamos \(-f\) internamente).
+2. Seleção por roleta: probabilidade proporcional à aptidão.
+3. Crossover de um ponto.
+4. Mutação uniforme com taxa \(\mu\).
+5. Elitismo opcional.
 
 ### Implementação
 
-- Parâmetros: `population_size` (ajustado para par), `generations`, `chromosome_length` (2), `mutation_rate`, `crossover_rate`, `rng_seed`.
-- Histórico guardado: `population_history` (cromossomos por geração), `history_best`, `history_best_pos`.
-- Na UI, a tabela por geração mostra: melhor indivíduo (após mapeamento), `f(x,y)`, `% de vizinhança` como fração dos indivíduos dentro de um raio do melhor ponto na geração.
+- Parâmetros: `population_size`, `generations`, `chromosome_length` (2), `mutation_rate`, `crossover_rate`, `rng_seed`.
+- Histórico: `population_history`, `history_best`, `history_best_pos`.
+- `% de vizinhança`: fração de indivíduos dentro do raio do melhor ponto.
 
 ## Visualização e GIFs
 
-- `ui/animation.py` cria GIFs 2D/3D da evolução usando Matplotlib.
-- Cada frame mostra as partículas/indivíduos daquela iteração e inclui título com contagem de iteração.
-- A UI exibe o GIF via `QMovie` e reinicia automaticamente ao trocar de aba (2D/3D).
-- `function_plot.py` e `function_plot_3d.py` mostram a função \\( f(x,y) \\) e destacam o melhor ponto final.
+- GIFs 2D/3D são gerados com Matplotlib em `ui/animation.py`.
+- Cada frame mostra partículas/indivíduos da iteração.
+- Na UI, exibidos com `QMovie`, reiniciam ao trocar sub-aba.
 
 ## Configuração Aleatória e Histórico
 
-- Botões “config aleatória” para PSO/GA geram hiperparâmetros em faixas predefinidas:
-  - PSO: partículas, iterações, inércia \\(\\omega\\), \\(c_1\\), \\(c_2\\), limites.
-  - GA: tamanho da população (forçado a par), gerações, taxas de mutação e crossover.
-- A configuração escolhida é exibida na UI e gravada em `project/ui/output/run_history.json` (mantém as últimas 50).
+- PSO: partículas, iterações, \(\omega\), \(c_1\), \(c_2\), limites.
+- GA: população (par), gerações, mutação, crossover.
+
+Histórico salvo em: `project/ui/output/run_history.json`.
 
 ## Execução
 
 Pré-requisitos:
-- Python 3.12 (venv configurado automaticamente)
-- Dependências em `requirements.txt` (PyQt6, numpy, matplotlib, imageio, etc.)
+- Python 3.12
+- Dependências em `requirements.txt`
 
-Instalação e execução (com ambiente virtual):
-
-1) Criar e ativar um ambiente virtual (Windows PowerShell):
+Criar venv:
 
 ```powershell
-# Na raiz do projeto
 python -m venv .venv
 .\.venv\Scripts\Activate.ps1
 ```
