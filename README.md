@@ -53,7 +53,7 @@ A função utilizada por padrão é uma combinação de termos oscilatórios (ti
 - Termo oscilatório:
 
 $$
-z = -x \sin(\sqrt{|x|}) \;-\; y \sin(\sqrt{|y|})
+z = -x \sin(\sqrt{|x|}) - y \sin(\sqrt{|y|})
 $$
 
 - Normalização auxiliar:
@@ -67,7 +67,7 @@ $$
 - Termo tipo Rosenbrock:
 
 $$
-r = 100\left( y_{\text{norm}} - 2x_{\text{norm}} \right)^2
+r = 100\left( y_{\text{norm}} - x_{\text{norm}}^2 \right)^2
     + \left( 1 - x_{\text{norm}} \right)^2
 $$
 
@@ -99,16 +99,17 @@ internamente (maximizam o negativo) e invertem o sinal para exibir resultados.
 - Atualização por iteração \(t\):
 
 Velocidade:
-
-\(\mathbf{v}_i^{t+1} = \omega \mathbf{v}_i^{t} + c_1 r_1 \left( \mathbf{p}_i - \mathbf{x}_i^t \right) + c_2 r_2 \left( \mathbf{g} - \mathbf{x}_i^t \right)\)
+$$
+\mathbf{v}_i^{t+1} = \omega \mathbf{v}_i^{t} + c_1 r_1 \left( \mathbf{p}_i - \mathbf{x}_i^t \right) + c_2 r_2 \left( \mathbf{g} - \mathbf{x}_i^t \right)
+$$
 
 Parâmetros:
-- \(\omega\): inércia  
-- \(c_1\): componente cognitiva  
-- \(c_2\): componente social  
-- \(r_1, r_2 \sim U(0,1)\)  
-- \(\mathbf{p}_i\): melhor posição pessoal  
-- \(\mathbf{g}\): melhor posição global  
+- $\omega$: inércia  
+- $c_1$: componente cognitiva  
+- $c_2$: componente social  
+- $r_1, r_2 \sim U(0,1)$  
+- $\mathbf{p}_i$: melhor posição pessoal  
+- $\mathbf{g}$: melhor posição global  
 
 - Restrições de posição e velocidade aplicadas para manter limites.
 
@@ -122,7 +123,7 @@ Parâmetros:
 
 ### Ideia Matemática
 
-- Representação: cromossomos reais em \([0,1]\) por dimensão; mapeados para \([-100, 100]\):
+- Representação: cromossomos reais em $[0,1]$ por dimensão; mapeados para $[-100, 100]$:
 
 $$
 \mathbf{x} = 200\mathbf{c} - 100
@@ -130,10 +131,10 @@ $$
 
 Ciclo por geração:
 
-1. Avaliação via aptidão (usamos \(-f\) internamente).
+1. Avaliação via aptidão (usamos $-f$ internamente).
 2. Seleção por roleta: probabilidade proporcional à aptidão.
 3. Crossover de um ponto.
-4. Mutação uniforme com taxa \(\mu\).
+4. Mutação uniforme com taxa $\mu$.
 5. Elitismo opcional.
 
 ### Implementação
@@ -150,7 +151,7 @@ Ciclo por geração:
 
 ## Configuração Aleatória e Histórico
 
-- PSO: partículas, iterações, \(\omega\), \(c_1\), \(c_2\), limites.
+- PSO: partículas, iterações, $\omega$, $c_1$, $c_2$, limites.
 - GA: população (par), gerações, mutação, crossover.
 
 Histórico salvo em: `project/ui/output/run_history.json`.
@@ -192,7 +193,7 @@ Na janela:
 
 ## Aspectos Técnicos Importantes
 
-- Sinal da aptidão: internamente os algoritmos usam \\(-f\\) para compatibilizar minimização; exibição e tabelas usam \\(f\\).
+- Sinal da aptidão: internamente os algoritmos usam $-f$ para compatibilizar minimização; exibição e tabelas usam $f$.
 - Desempenho da UI: todos os históricos são acumulados nos workers e renderizados ao final, evitando travamentos.
 - Compatibilidade Matplotlib + Qt: captura de frames via `buffer_rgba()` para robustez com `FigureCanvasQTAgg`.
 - GA — população par: garantido na configuração aleatória para evitar erros de pareamento no crossover.
