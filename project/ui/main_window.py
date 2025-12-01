@@ -9,21 +9,13 @@ import numpy as np
 import os
 import json
 
+from core.fitness.fitness_functions import objective_function
+
 from ui.ga_worker import GAWorker
 from ui.pso_worker import PSOWorker
 from ui.charts import HistoryChart
 from ui.function_plot import FunctionPlot
 from ui.function_plot_3d import FunctionPlot3D
-
-
-def objective_function(pos):
-    x = pos[:, 0]
-    y = pos[:, 1]
-    z = -x * np.sin(np.sqrt(np.abs(x))) - y * np.sin(np.sqrt(np.abs(y)))
-    x_norm = x / 250
-    y_norm = y / 250
-    r = 100 * (y_norm - x_norm * 2) ** 2 + (1 - x_norm) ** 2
-    return r - z
 
 
 class MainWindow(QMainWindow):
