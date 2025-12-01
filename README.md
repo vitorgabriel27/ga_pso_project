@@ -95,13 +95,11 @@ internamente (maximizam o negativo) e invertem o sinal para exibir resultados.
 
 ### Ideia Matemática
 
-- Inicialização de \(N\) partículas com posição \(\mathbf{x}_i\) e velocidade \(\mathbf{v}_i\) dentro de limites \([L, U]\).
-- Atualização por iteração \(t\):
+- Inicialização de $N$ partículas com posição $\mathbf{x}_i$ e velocidade $\mathbf{v}_i$ dentro de limites $[L, U]$.
+- Atualização por iteração $t$:
 
 Velocidade:
-$$
-\mathbf{v}_i^{t+1} = \omega \mathbf{v}_i^{t} + c_1 r_1 \left( \mathbf{p}_i - \mathbf{x}_i^t \right) + c_2 r_2 \left( \mathbf{g} - \mathbf{x}_i^t \right)
-$$
+$$\mathbf{v}_i^{t+1} = \omega \mathbf{v}_i^{t} + c_1 r_1 \left( \mathbf{p}_i - \mathbf{x}_i^t \right) + c_2 r_2 \left( \mathbf{g} - \mathbf{x}_i^t \right)$$
 
 Parâmetros:
 - $\omega$: inércia  
