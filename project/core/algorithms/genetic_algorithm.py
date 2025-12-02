@@ -14,6 +14,7 @@ class GeneticAlgorithm(BaseOptimizer):
         selection_op,
         crossover_op,
         mutation_op,
+        elitism_count: int = 2,
         rng=None,
     ):
         self.fitness_func = fitness_func
@@ -25,6 +26,7 @@ class GeneticAlgorithm(BaseOptimizer):
         self.selection_op = selection_op
         self.crossover_op = crossover_op
         self.mutation_op = mutation_op
+        self.elitism_count = max(0, int(elitism_count))
         self.rng = rng or np.random.default_rng()
 
         # população inicial entre 0 e 1
@@ -32,10 +34,8 @@ class GeneticAlgorithm(BaseOptimizer):
 
     def optimize(self, on_update=None):
         for gen in range(self.num_generations):
-            # Avalia fitness
             fitness = self.fitness_func(self.population)
 
-            # Envia estado da geração para UI
             if on_update is not None:
                 on_update({
                     "generation": gen,
@@ -54,7 +54,14 @@ class GeneticAlgorithm(BaseOptimizer):
             # Mutação
             mutated = self.mutation_op(offspring, self.mutation_rate, self.rng)
 
-            # Atualiza população
+            # Elitismo
+            if self.elitism_count > 0:
+                elite_idx = np.argsort(fitness)[-self.elitism_count:]
+                elites = self.population[elite_idx]
+                new_fit = self.fitness_func(mutated)
+                worst_idx = np.argsort(new_fit)[:self.elitism_count]
+                mutated[worst_idx] = elites
+
             self.population = mutated
 
         # Resultado final

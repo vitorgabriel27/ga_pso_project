@@ -11,7 +11,7 @@ from core.fitness.fitness_functions import objective_function
 from core.algorithms.genetic_algorithm import GeneticAlgorithm
 from core.algorithms.particle_swarm import ParticleSwarm
 from core.operators.selection import roulette_selection
-from core.operators.crossover import one_point_crossover
+from core.operators.crossover import one_point_crossover, blx_alpha_crossover
 from core.operators.mutation import uniform_mutation
 
 NUM_RUNS = 5  # Quantas vezes rodar cada configuração para tirar a média
@@ -51,10 +51,14 @@ def calculate_metrics(history_best, final_population, best_pos, lower, upper):
 
 # Cenários para o GA (Variando Tamanho da População e Mutação)
 ga_scenarios = [
-    {"name": "GA_Padrao", "pop": 40, "gen": 200, "mut": 0.1, "cross": 0.7},
-    {"name": "GA_Pop_Baixa", "pop": 20, "gen": 200, "mut": 0.1, "cross": 0.7},
-    {"name": "GA_Pop_Alta", "pop": 80, "gen": 200, "mut": 0.1, "cross": 0.7},
-    {"name": "GA_Mut_Alta", "pop": 40, "gen": 200, "mut": 0.2, "cross": 0.7},
+    {"name": "GA_Padrao_OnePoint", "pop": 40, "gen": 200, "mut": 0.1, "cross": 0.7, "type": "one-point"},
+    {"name": "GA_Pop_Baixa_OnePoint", "pop": 20, "gen": 200, "mut": 0.1, "cross": 0.7, "type": "one-point"},
+    {"name": "GA_Pop_Alta_OnePoint", "pop": 80, "gen": 200, "mut": 0.1, "cross": 0.7, "type": "one-point"},
+    {"name": "GA_Mut_Alta_OnePoint", "pop": 40, "gen": 200, "mut": 0.2, "cross": 0.7, "type": "one-point"},
+    # BLX-α variants
+    {"name": "GA_Padrao_BLX", "pop": 40, "gen": 200, "mut": 0.1, "cross": 0.7, "type": "blx-alpha", "alpha": 0.3},
+    {"name": "GA_Mut_Alta_BLX", "pop": 40, "gen": 200, "mut": 0.2, "cross": 0.7, "type": "blx-alpha", "alpha": 0.3},
+    {"name": "GA_Pop_Baixa_BLX", "pop": 20, "gen": 200, "mut": 0.1, "cross": 0.7, "type": "blx-alpha", "alpha": 0.3},
 ]
 
 # Cenários para o PSO (Variando Inércia e Partículas)
@@ -80,6 +84,14 @@ for scenario in ga_scenarios:
         # x_real = x_norm * 200 - 100
         fitness_wrapper = lambda pop: -objective_function(pop * 200 - 100)
         
+        # Escolhe operador de crossover
+        if scenario.get("type") == "blx-alpha":
+            alpha = float(scenario.get("alpha", 0.3))
+            def crossover_fn(pop, rate, rng):
+                return blx_alpha_crossover(pop, rate, alpha, rng, lower_bounds=0.0, upper_bounds=1.0)
+        else:
+            crossover_fn = one_point_crossover
+
         ga = GeneticAlgorithm(
             fitness_func=fitness_wrapper,
             population_size=scenario["pop"],
@@ -88,7 +100,7 @@ for scenario in ga_scenarios:
             mutation_rate=scenario["mut"],
             chromosome_length=2,
             selection_op=roulette_selection, 
-            crossover_op=one_point_crossover, 
+            crossover_op=crossover_fn, 
             mutation_op=uniform_mutation
         )
         

@@ -1,7 +1,7 @@
 from PyQt6.QtWidgets import (
     QMainWindow, QWidget, QPushButton,
     QVBoxLayout, QLabel, QTabWidget, QHBoxLayout,
-    QTableWidget, QTableWidgetItem, QMessageBox
+    QTableWidget, QTableWidgetItem, QMessageBox, QComboBox, QLineEdit
 )
 from PyQt6.QtCore import QThread, Qt
 from PyQt6.QtGui import QMovie
@@ -74,8 +74,23 @@ class MainWindow(QMainWindow):
         self.btn_ga.clicked.connect(self.run_ga)
         self.btn_ga_random.clicked.connect(lambda: self.run_ga(randomize=True))
         self.ga_cfg_label = QLabel("Configuração: padrão")
+        # Crossover config controls
+        cfg_row = QHBoxLayout()
+        lbl_type = QLabel("Crossover:")
+        self.ga_crossover_combo = QComboBox()
+        self.ga_crossover_combo.addItems(["one-point", "blx-alpha"])
+        lbl_alpha = QLabel("α:")
+        self.ga_blx_alpha_input = QLineEdit()
+        self.ga_blx_alpha_input.setPlaceholderText("0.3")
+        self.ga_blx_alpha_input.setFixedWidth(80)
+        cfg_row.addWidget(lbl_type)
+        cfg_row.addWidget(self.ga_crossover_combo)
+        cfg_row.addWidget(lbl_alpha)
+        cfg_row.addWidget(self.ga_blx_alpha_input)
+        cfg_row.addStretch()
         layout.addWidget(self.btn_ga)
         layout.addWidget(self.btn_ga_random)
+        layout.addLayout(cfg_row)
         layout.addWidget(self.ga_cfg_label)
         self.ga_chart = HistoryChart()
         # Result table for GA (all iterations)
@@ -235,6 +250,16 @@ class MainWindow(QMainWindow):
             "crossover_rate": 0.7,
             "rng_seed": 42,
         }
+        # Include crossover type and alpha from UI
+        if randomize:
+            # Randomize crossover choice and alpha moderately
+            rng = np.random.default_rng()
+            cfg["crossover_type"] = ["one-point", "blx-alpha"][int(rng.integers(0,2))]
+            cfg["blx_alpha"] = float(rng.uniform(0.1, 0.5))
+        else:
+            cfg["crossover_type"] = self.ga_crossover_combo.currentText()
+            alpha_text = self.ga_blx_alpha_input.text().strip()
+            cfg["blx_alpha"] = float(alpha_text) if alpha_text else 0.3
         # Show chosen config in UI
         self._show_config("ga", cfg, randomize)
         self._append_history("ga", cfg)
@@ -310,12 +335,11 @@ class MainWindow(QMainWindow):
         """
         Gera um popup com os dados calculados para o relatório.
         """
-        # 1. Melhor Fitness Final
-        # O history_best vem negativo (por causa da minimização interna), invertemos aqui
+        # Melhor Fitness Final
         real_history = [-val for val in history_best]
         best_fitness = real_history[-1]
 
-        # 2. Iteração de Estabilização
+        # Iteração de Estabilização
         # Critério: Primeira iteração onde o fitness chegou muito próximo (1e-6) do valor final
         stabilization_iter = 0
         for i, val in enumerate(real_history):
@@ -488,7 +512,25 @@ class MainWindow(QMainWindow):
             data = data[-50:]
             with open(hist_path, "w", encoding="utf-8") as f:
                 json.dump(data, f, indent=2)  
-            self._add_row_to_params_table(entry)
+            # Also persist tested parameters for the UI table with timestamp
+            tested_path = os.path.join(out_dir, "tested_parameters.json")
+            tested_data = []
+            if os.path.exists(tested_path):
+                try:
+                    with open(tested_path, "r", encoding="utf-8") as tf:
+                        tested_data = json.load(tf)
+                except Exception:
+                    tested_data = []
+            ui_entry = {
+                "algorithm": algo.upper(),
+                "config": cfg,
+                "timestamp": self._current_timestamp(),
+            }
+            tested_data.append(ui_entry)
+            tested_data = tested_data[-100:]
+            with open(tested_path, "w", encoding="utf-8") as tf:
+                json.dump(tested_data, tf, indent=2)
+            self._add_row_to_params_table(ui_entry)
         except Exception:
             # Silent fail for history
             pass

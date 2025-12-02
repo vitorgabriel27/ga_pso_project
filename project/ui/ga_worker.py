@@ -2,7 +2,7 @@ from PyQt6.QtCore import QObject, pyqtSignal
 import numpy as np
 from core.algorithms.genetic_algorithm import GeneticAlgorithm
 from core.operators.selection import roulette_selection
-from core.operators.crossover import one_point_crossover
+from core.operators.crossover import one_point_crossover, blx_alpha_crossover
 from core.operators.mutation import uniform_mutation
 
 
@@ -22,6 +22,8 @@ class GAWorker(QObject):
         selection_op=roulette_selection,
         crossover_op=one_point_crossover,
         mutation_op=uniform_mutation,
+        crossover_type: str | None = None,
+        blx_alpha: float = 0.3,
     ):
         super().__init__()
         self.fitness_func = fitness_func
@@ -34,8 +36,20 @@ class GAWorker(QObject):
         self.selection_op = selection_op
         self.crossover_op = crossover_op
         self.mutation_op = mutation_op
+        self.crossover_type = crossover_type or "one-point"
+        self.blx_alpha = blx_alpha
 
     def run(self):
+        # Define operador de crossover conforme configuração
+        if self.crossover_type == "blx-alpha":
+            # Bounds assumidos para cromossomos em [0,1]
+            lower_bounds = 0.0
+            upper_bounds = 1.0
+            def _crossover(pop, rate, rng):
+                return blx_alpha_crossover(pop, rate, self.blx_alpha, rng, lower_bounds, upper_bounds)
+            crossover_callable = _crossover
+        else:
+            crossover_callable = self.crossover_op
         ga = GeneticAlgorithm(
             fitness_func=self.fitness_func,
             population_size=self.population_size,
@@ -44,7 +58,7 @@ class GAWorker(QObject):
             mutation_rate=self.mutation_rate,
             chromosome_length=self.chromosome_length,
             selection_op=self.selection_op,
-            crossover_op=self.crossover_op,
+            crossover_op=crossover_callable,
             mutation_op=self.mutation_op,
             rng=np.random.default_rng(self.rng_seed),
         )

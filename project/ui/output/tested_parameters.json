@@ -1,0 +1,16 @@
+[
+  {
+    "algorithm": "GA",
+    "config": {
+      "population_size": 40,
+      "generations": 200,
+      "chromosome_length": 2,
+      "mutation_rate": 0.1,
+      "crossover_rate": 0.7,
+      "rng_seed": 42,
+      "crossover_type": "blx-alpha",
+      "blx_alpha": 0.3
+    },
+    "timestamp": "2025-12-02 10:29:05"
+  }
+]
